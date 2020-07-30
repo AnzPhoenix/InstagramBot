@@ -1,6 +1,6 @@
 # InstagramBot
 This will be a fully functional Instagram web scraper/bot.
-
+### Not yet complete!
 ## Getting Started
 Create a file in the same directory and name it config.ini
 In the first line of config.ini, type AUTH surrounded by square brackets.
