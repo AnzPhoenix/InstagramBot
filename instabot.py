@@ -179,29 +179,45 @@ class InstaBot:
         if new_num_of_following < 600:
             #while the number of people the account is following is less than 600
             while new_num_of_following < 600:
+                new_num_of_following = int_num_of_following + iteration_num
                 self.driver.implicitly_wait(10)
-                #find the liked by button
-                liked_by_button = self.driver.find_element_by_xpath(
-                    '/html/body/div[4]/div[2]/div/article/div/div[3]/section[2]/div/div[1]/button')
-                liked_by_button.click()
-                self.driver.implicitly_wait(2)
+                try:
+                    #find the liked by button
+                    liked_by_button = self.driver.find_element_by_xpath(
+                        '/html/body/div[4]/div[2]/div/article/div/div[3]/section[2]/div/div[1]/button')
+                    liked_by_button.click()
+                    self.driver.implicitly_wait(2)
+                except:
+                    if while_loop_iteration < 1:
+                        next_button = self.driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div/a')
+                        next_button.click()
+                        sleep(random.randint(1, 3))
+                    else:
+                        next_button = self.driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div/a[2]')
+                        next_button.click()
+                        sleep(random.randint(1, 3))
+
+                    while_loop_iteration += 1
 
                 #changes the [] on the div before div[3]/button
                 div_num = 1
 
                 #follows the first 10 people on the liked by list
                 for i in range(10):
-                    follow_button = self.driver.find_element_by_xpath(
-                        '/html/body/div[5]/div/div/div[2]/div/div/div' + '[' + str(div_num) + ']' '/div[3]/button')
-                    #checks if the button says follow
-                    if follow_button.text == 'Follow':
-                        follow_button.click()
-                        iteration_num += 1
-                        div_num += 1
-                        sleep(random.randint(1,3))
-                    else:
-                        div_num += 1
-                        sleep(random.randint(1,3))
+                    try:
+                        follow_button = self.driver.find_element_by_xpath(
+                            '/html/body/div[5]/div/div/div[2]/div/div/div' + '[' + str(div_num) + ']' '/div[3]/button')
+                        #checks if the button says follow
+                        if follow_button.text == 'Follow':
+                            follow_button.click()
+                            iteration_num += 1
+                            div_num += 1
+                            sleep(random.randint(1,3))
+                        else:
+                            div_num += 1
+                            sleep(random.randint(1,3))
+                    except:
+                        break
 
                 #closes the popup window
                 close_button = self.driver.find_element_by_xpath('/html/body/div[5]/div/div/div[1]/div/div[2]/button')
