@@ -5,6 +5,7 @@ import os
 import configparser
 import random
 import pandas
+import csv
 
 class InstaBot:
     def __init__(self, username, password):
@@ -236,9 +237,42 @@ class InstaBot:
                 while_loop_iteration += 1
 
         else:
-            return
+            self.write_followers_to_csv()
 
+    def unfollow_not_following_back(self):
         self.write_followers_to_csv()
+        sleep(random.randint(3,5))
+
+        #opens the followers - Sheet1.csv file
+        with open('followers - Sheet1.csv') as follower_file:
+            users = csv.DictReader(follower_file, delimiter=',')
+            for user in users:
+                #if a user in the following column is not in the followers column
+                if user['Following'] not in user['Followers']:
+                    #go to the user's profile and unfollow
+                    self.driver.get('https://instagram.com/' + user['Following'])
+                    self.driver.implicitly_wait(2)
+                    unfollow_button = self.driver.find_element_by_xpath(
+                        '/html/body/div[1]/section/main/div/header/section/div[1]/div[2]/div/span/span[1]/button')
+                    unfollow_button.click()
+                    sleep(random.randint(1, 3))
+                    #if there is a popup to confirm unfollow
+                    try:
+                        confirm_unfollow_button = self.driver.find_element_by_xpath(
+                            '/html/body/div[4]/div/div/div/div[3]/button[1]')
+                        confirm_unfollow_button.click()
+                        sleep(random.randint(1, 3))
+                    except:
+                        continue
+                    #if there is a follow back button for some reason 
+                    try:
+                        follow_back_button = self.driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/span/span[1]/button')
+                        follow_back_button.click()
+                    except:
+                        continue
+                else:
+                    continue
+
 
 if __name__ == '__main__':
 
@@ -252,7 +286,11 @@ if __name__ == '__main__':
 
     #for reading follower and following list
     #datafile = pandas.read_csv('followers - Sheet1.csv')
+
+    #creates a list for followers
     #follower = datafile.Followers
+
+    #creates a list for following
     #following = datafile.Following
 
     ig_bot = InstaBot(username, password)
@@ -260,6 +298,7 @@ if __name__ == '__main__':
 #ig_bot.follow_user('nzxt')
 #ig_bot.like_user_post('nzxt')
 #ig_bot.nav_hashtag('pcbuilds')
-#ig_bot.like_hastag_post('pcbuilds')
 #ig_bot.write_followers_to_csv()
 ig_bot.follow_post_likers('pcbuilds')
+sleep(random.randint(3,5))
+ig_bot.unfollow_not_following_back()
