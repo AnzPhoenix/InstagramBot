@@ -264,7 +264,7 @@ class InstaBot:
                         sleep(random.randint(1, 3))
                     except:
                         continue
-                    #if there is a follow back button for some reason 
+                    #if there is a follow back button for some reason
                     try:
                         follow_back_button = self.driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/span/span[1]/button')
                         follow_back_button.click()
@@ -295,10 +295,6 @@ if __name__ == '__main__':
 
     ig_bot = InstaBot(username, password)
 
-#ig_bot.follow_user('nzxt')
-#ig_bot.like_user_post('nzxt')
-#ig_bot.nav_hashtag('pcbuilds')
-#ig_bot.write_followers_to_csv()
 ig_bot.follow_post_likers('pcbuilds')
 sleep(random.randint(3,5))
 ig_bot.unfollow_not_following_back()
