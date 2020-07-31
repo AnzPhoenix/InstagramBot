@@ -307,27 +307,32 @@ class InstaBot:
         sleep(random.randint(3,10))
 
         for i in following_list:
-            if i not in follower_list:
-            #go to the user's profile and unfollow
-                self.driver.get('https://instagram.com/' + i)
-                self.driver.implicitly_wait(2)
-                try:
-                    unfollow_button = self.driver.find_element_by_xpath(
-                        '/html/body/div[1]/section/main/div/header/section/div[1]/div[2]/div/span/span[1]/button')
-                except:
-                    unfollow_button = self.driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/span/span[1]/button')
-                unfollow_button.click()
-                sleep(random.randint(1, 3))
-                #if there is a popup to confirm unfollow
-                try:
-                    confirm_unfollow_button = self.driver.find_element_by_xpath(
-                        '/html/body/div[4]/div/div/div/div[3]/button[1]')
-                    confirm_unfollow_button.click()
-                    sleep(random.randint(1, 3))
-                except:
+            try:
+                if i not in follower_list:
+                #go to the user's profile and unfollow
+                    self.driver.get('https://instagram.com/' + i)
+                    self.driver.implicitly_wait(2)
+                    try:
+                        sleep(random.randint(15,45))
+                        unfollow_button = self.driver.find_element_by_xpath(
+                            '/html/body/div[1]/section/main/div/header/section/div[1]/div[2]/div/span/span[1]/button')
+                    except:
+                        unfollow_button = self.driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/span/span[1]/button')
+                    unfollow_button.click()
+                    sleep(random.randint(15,45))
+                    #if there is a popup to confirm unfollow
+                    try:
+                        confirm_unfollow_button = self.driver.find_element_by_xpath(
+                            '/html/body/div[4]/div/div/div/div[3]/button[1]')
+                        confirm_unfollow_button.click()
+                        sleep(random.randint(15, 30))
+                    except:
+                        continue
+                else:
                     continue
-            else:
+            except:
                 continue
+
 
 
 if __name__ == '__main__':
@@ -353,4 +358,9 @@ if __name__ == '__main__':
 
 # ig_bot.follow_post_likers('pcbuilds')
 # sleep(random.randint(3,5))
-ig_bot.unfollow_not_following_back()
+script_on = True
+while script_on == True:
+    ig_bot.unfollow_not_following_back()
+    sleep(random.randint(30,60))
+    ig_bot.follow_post_likers('pcbuilds')
+    sleep(random.randint(30, 60))
