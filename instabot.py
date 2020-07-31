@@ -243,35 +243,91 @@ class InstaBot:
         self.write_followers_to_csv()
         sleep(random.randint(3,5))
 
-        #opens the followers - Sheet1.csv file
-        with open('followers - Sheet1.csv') as follower_file:
-            users = csv.DictReader(follower_file, delimiter=',')
-            for user in users:
-                #if a user in the following column is not in the followers column
-                if user['Following'] not in user['Followers']:
-                    #go to the user's profile and unfollow
-                    self.driver.get('https://instagram.com/' + user['Following'])
-                    self.driver.implicitly_wait(2)
+        self.driver.get('https://www.instagram.com/' + username)
+        self.driver.implicitly_wait(2)
+        #finds the number of followers for future reference
+        num_of_followers = self.driver.find_element_by_xpath("/html/body/div[1]/section/main/div/header/section/ul/li[2]/a/span").text
+        int_num_of_followers = int(num_of_followers)
+        self.driver.implicitly_wait(2)
+        #finds the follower button
+        followers_button = self.driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/ul/li[2]/a')
+        followers_button.click()
+        self.driver.implicitly_wait(10)
+        #finds an initial anchor point, creates an empty list
+        anchor_point = self.driver.find_element_by_css_selector('.PZuss > li:nth-child(1) > div:nth-child(1) > div:nth-child(3) > button:nth-child(1)')
+        follower_list = []
+        num_of_down_clicks = 0
+        #while the number of followers is more than the number of end key clicks, click the end key and add 1 to number of end clicks
+        while int_num_of_followers > num_of_down_clicks:
+            anchor_point.send_keys(Keys.END)
+            #refreshes the anchor point every iteration
+            anchor_point = self.driver.find_element_by_xpath('/html/body/div[4]/div/div/div[2]/ul/div/li/div/div[2]/button')
+            num_of_down_clicks += 1
+
+        #finds all the elements with this xpath(the square brackets next to the li element specifies which username)
+        followers = self.driver.find_elements_by_xpath(
+            "/html/body/div[4]/div/div/div[2]/ul/div/li/div/div[1]/div[2]/div[1]/span/a")
+
+        #iterates through the list of usernames and takes the text and puts it into the follower_list list
+        for i in followers:
+            self.driver.implicitly_wait(2)
+            follower_list.append(i.text)
+
+
+        #switches back to the profile page
+        self.driver.get('https://www.instagram.com/techarchlight')
+
+        #gets the amount of people that admin is following and concatenates it into a integer
+        num_of_following = self.driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/ul/li[3]/a/span').text
+        int_num_of_following = int(num_of_following)
+
+        following_button = self.driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/ul/li[3]/a')
+        following_button.click()
+
+        #finds an anchor point, creates an empty list, and declares the number of end clicks for the following list
+        self.driver.implicitly_wait(10)
+        following_anchor_point = self.driver.find_element_by_css_selector('.PZuss > li:nth-child(1) > div:nth-child(1) > div:nth-child(3) > button:nth-child(1)')
+        following_list = []
+        following_num_of_down_clicks = 0
+
+        while int_num_of_following > following_num_of_down_clicks:
+            following_anchor_point.send_keys(Keys.END)
+
+            #refreshes the anchor point every iteration
+
+            following_anchor_point = self.driver.find_element_by_xpath('/html/body/div[4]/div/div/div[2]/ul/div/li/div/div[2]/button')
+            following_num_of_down_clicks += 1
+
+        followings = self.driver.find_elements_by_xpath('/html/body/div[4]/div/div/div[2]/ul/div/li/div/div[1]/div[2]/div[1]/span/a')
+
+        for i in followings:
+            self.driver.implicitly_wait(2)
+            following_list.append(i.text)
+
+        sleep(random.randint(3,10))
+
+        for i in following_list:
+            if i not in follower_list:
+            #go to the user's profile and unfollow
+                self.driver.get('https://instagram.com/' + i)
+                self.driver.implicitly_wait(2)
+                try:
                     unfollow_button = self.driver.find_element_by_xpath(
                         '/html/body/div[1]/section/main/div/header/section/div[1]/div[2]/div/span/span[1]/button')
-                    unfollow_button.click()
+                except:
+                    unfollow_button = self.driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/span/span[1]/button')
+                unfollow_button.click()
+                sleep(random.randint(1, 3))
+                #if there is a popup to confirm unfollow
+                try:
+                    confirm_unfollow_button = self.driver.find_element_by_xpath(
+                        '/html/body/div[4]/div/div/div/div[3]/button[1]')
+                    confirm_unfollow_button.click()
                     sleep(random.randint(1, 3))
-                    #if there is a popup to confirm unfollow
-                    try:
-                        confirm_unfollow_button = self.driver.find_element_by_xpath(
-                            '/html/body/div[4]/div/div/div/div[3]/button[1]')
-                        confirm_unfollow_button.click()
-                        sleep(random.randint(1, 3))
-                    except:
-                        continue
-                    #if there is a follow back button for some reason
-                    try:
-                        follow_back_button = self.driver.find_element_by_xpath('/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/span/span[1]/button')
-                        follow_back_button.click()
-                    except:
-                        continue
-                else:
+                except:
                     continue
+            else:
+                continue
 
 
 if __name__ == '__main__':
@@ -295,6 +351,6 @@ if __name__ == '__main__':
 
     ig_bot = InstaBot(username, password)
 
-ig_bot.follow_post_likers('pcbuilds')
-sleep(random.randint(3,5))
+# ig_bot.follow_post_likers('pcbuilds')
+# sleep(random.randint(3,5))
 ig_bot.unfollow_not_following_back()
