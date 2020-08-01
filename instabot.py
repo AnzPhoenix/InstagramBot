@@ -328,6 +328,14 @@ class InstaBot:
                         sleep(random.randint(15, 30))
                     except:
                         continue
+
+                    #if there is a popup window saying report a problem
+                    try:
+                        report_a_problem_button = self.driver.find_element_by_xpath('/html/body/div[4]/div/div/div/div[2]/button[1]')
+                        report_a_problem_button.click()
+                        sleep(random.randint(15,30))
+                    except:
+                        continue
                 else:
                     continue
             except:
