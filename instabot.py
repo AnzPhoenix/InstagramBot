@@ -142,7 +142,12 @@ class InstaBot:
         following_num_of_down_clicks = 0
 
         while int_num_of_following > following_num_of_down_clicks:
-            following_anchor_point.send_keys(Keys.END)
+            try:
+                following_anchor_point.send_keys(Keys.END)
+            except:
+                following_anchor_point = self.driver.find_element_by_xpath(
+                    '/html/body/div[4]/div/div/div[2]/ul/div/li[1]/div/div[3]/button')
+                following_anchor_point.send_keys(Keys.END)
 
             # refreshes the anchor point every iteration
 
@@ -210,6 +215,7 @@ class InstaBot:
                         '/html/body/div[4]/div[2]/div/article/div/div[3]/section[2]/div/div[1]/button')
                     liked_by_button.click()
                     self.driver.implicitly_wait(2)
+                    sleep(random.randint(1, 3))
                 except:
                     if while_loop_iteration < 1:
                         next_button = self.driver.find_element_by_xpath('/html/body/div[4]/div[1]/div/div/a')
@@ -262,8 +268,6 @@ class InstaBot:
             self.write_followers_to_csv()
 
     def unfollow_not_following_back(self):
-        self.write_followers_to_csv()
-        sleep(random.randint(3, 5))
 
         self.driver.get('https://www.instagram.com/' + username)
         self.driver.implicitly_wait(2)
@@ -342,55 +346,64 @@ class InstaBot:
             self.driver.implicitly_wait(2)
             following_list.append(i.text)
 
-        sleep(random.randint(3, 10))
+        unfollow_button = self.driver.find_elements_by_xpath('/html/body/div[4]/div/div/div[2]/ul/div/li/div/div[2]/button')
 
         unfollow_limit = 0
+        for i in unfollow_button:
+            if i not in follower_list and unfollow_limit < 60:
+                unfollow_button.click()
+                sleep(random.randint(60, 120))
+            else:
+                break
 
-        for i in following_list:
-            try:
-                if i not in follower_list:
-                    # go to the user's profile and unfollow
-                    self.driver.get('https://instagram.com/' + i)
-                    self.driver.implicitly_wait(2)
-                    try:
-                        sleep(random.randint(15, 45))
-                        unfollow_button = self.driver.find_element_by_xpath(
-                            '/html/body/div[1]/section/main/div/header/section/div[1]/div[2]/div/span/span[1]/button')
-                    except:
-                        unfollow_button = self.driver.find_element_by_xpath(
-                            '/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/span/span[1]/button')
-                    unfollow_button.click()
-                    sleep(random.randint(15, 45))
-                    # if there is a popup to confirm unfollow
-                    try:
-                        confirm_unfollow_button = self.driver.find_element_by_xpath(
-                            '/html/body/div[4]/div/div/div/div[3]/button[1]')
-                        confirm_unfollow_button.click()
-                        sleep(random.randint(15, 30))
 
-                        unfollow_limit += 1
-                    except:
-                        continue
 
-                    # if there is a popup window saying report a problem
-                    try:
-                        report_a_problem_button = self.driver.find_element_by_xpath(
-                            '/html/body/div[4]/div/div/div/div[2]/button[1]')
-                        report_a_problem_button.click()
-                        sleep(random.randint(15, 30))
-                    except:
-                        continue
-                        
-                    if unfollow_limit < 60:
-                        continue
-                    elif unfollow_limit > 60:
-                        break
-                    elif unfollow_limit == 60:
-                        break
-                else:
-                    continue
-            except:
-                continue
+
+        # for i in following_list:
+        #     try:
+        #         if i not in follower_list:
+        #             # go to the user's profile and unfollow
+        #             self.driver.get('https://instagram.com/' + i)
+        #             self.driver.implicitly_wait(2)
+        #             try:
+        #                 sleep(random.randint(15, 45))
+        #                 unfollow_button = self.driver.find_element_by_xpath(
+        #                     '/html/body/div[1]/section/main/div/header/section/div[1]/div[2]/div/span/span[1]/button')
+        #             except:
+        #                 unfollow_button = self.driver.find_element_by_xpath(
+        #                     '/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/span/span[1]/button')
+        #             unfollow_button.click()
+        #             sleep(random.randint(15, 45))
+        #             # if there is a popup to confirm unfollow
+        #             try:
+        #                 confirm_unfollow_button = self.driver.find_element_by_xpath(
+        #                     '/html/body/div[4]/div/div/div/div[3]/button[1]')
+        #                 confirm_unfollow_button.click()
+        #                 sleep(random.randint(15, 30))
+        #
+        #                 unfollow_limit += 1
+        #             except:
+        #                 continue
+        #
+        #             # if there is a popup window saying report a problem
+        #             try:
+        #                 report_a_problem_button = self.driver.find_element_by_xpath(
+        #                     '/html/body/div[4]/div/div/div/div[2]/button[1]')
+        #                 report_a_problem_button.click()
+        #                 sleep(random.randint(15, 30))
+        #             except:
+        #                 continue
+        #
+        #             if unfollow_limit < 60:
+        #                 continue
+        #             elif unfollow_limit > 60:
+        #                 break
+        #             elif unfollow_limit == 60:
+        #                 break
+        #         else:
+        #             continue
+        #     except:
+        #         continue
 
 
 if __name__ == '__main__':
